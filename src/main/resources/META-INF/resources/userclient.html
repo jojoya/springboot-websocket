@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>客户端</title>
+</head>
+昵称：
+<input type="text" id="username">
+<input type="button" value="连接" onclick="connect()"><br>
+<input type="button" value="断开" onclick="closeconnect()"><br>
+
+消息：
+<input type="text" id="writeMsg">
+<input type="button" value="发送" onclick="sendMsg()"><br>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+    var ws = null;
+    function connect() {
+        var uname = $("#username").val();
+//        if($("#username")!=null && $("#username")!=""){
+        if(uname!=null && uname!=""){
+            if('WebSocket' in window){
+                ws = new WebSocket("ws://localhost:8080/socketServer/"+uname);
+            }else if('MozWebSocket' in window){
+                ws = new MozWebSocket("ws://localhost:8080/socketServer/"+uname);
+            }else {
+                alert("浏览器不支持websocket");
+            }
+
+            ws.onmessage = function (evt) {
+                alert(evt.data);
+            }
+            
+            ws.onclose = function (evt) {
+                alert("连接中断.");
+            }
+
+            ws.onopen = function (evt) {
+                alert("连接成功.");
+            }
+        }else {
+            alert("请输入昵称");
+        }
+    }
+    
+    function sendMsg() {
+        var msg= $("#writeMsg").val();
+        alert(msg);
+        ws.send(msg);
+    }
+
+    function closeconnect() {
+        ws.close();
+        alert("主动中断.");
+    }
+
+</script>
+</body>
+</html>
