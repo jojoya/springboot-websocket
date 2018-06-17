@@ -4,21 +4,26 @@
     <meta charset="UTF-8">
     <title>客户端</title>
 </head>
-昵称：
-<input type="text" id="username">
-<input type="button" value="连接" onclick="connect()"><br>
-<input type="button" value="断开" onclick="closeconnect()"><br>
+<body>
+<div id="message"  style='overflow-y:auto;overflow-x: hidden;'></div>
+<hr style="height:3px;border:none;border-top:3px double red;" />
 
 消息：
 <input type="text" id="writeMsg">
 <input type="button" value="发送" onclick="sendMsg()"><br>
+昵称：
+<input type="text" id="username">
+<input type="button" value="连接" onclick="connect()">
+<input type="button" value="断开" onclick="closeconnect()"><br>
 
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="http://cdn.sockjs.org/sockjs-0.3.js"></script>
 <script type="text/javascript">
+    scrollToEnd();//滚动到底部
+
     var ws = null;
     function connect() {
         var uname = $("#username").val();
-//        if($("#username")!=null && $("#username")!=""){
         if(uname!=null && uname!=""){
             if('WebSocket' in window){
                 ws = new WebSocket("ws://localhost:8080/socketServer/"+uname);
@@ -28,16 +33,18 @@
                 alert("浏览器不支持websocket");
             }
 
-            ws.onmessage = function (evt) {
-                alert(evt.data);
+            ws.onmessage = function (msg) {
+//                alert(msg.data);
+//                console.log(msg.data);
+                setMessageInnerHTML(msg.data);
             }
             
-            ws.onclose = function (evt) {
-                alert("连接中断.");
+            ws.onclose = function () {
+                setMessageInnerHTML(uname + "连接中断.");
             }
 
-            ws.onopen = function (evt) {
-                alert("连接成功.");
+            ws.onopen = function () {
+                setMessageInnerHTML(uname + "连接成功.");
             }
         }else {
             alert("请输入昵称");
@@ -46,13 +53,25 @@
     
     function sendMsg() {
         var msg= $("#writeMsg").val();
-        alert(msg);
+        setMessageInnerHTML(msg);
         ws.send(msg);
     }
 
     function closeconnect() {
         ws.close();
-        alert("主动中断.");
+        setMessageInnerHTML("【手动】");
+    }
+
+    //将消息显示在网页上
+    function setMessageInnerHTML(innerHTML){
+        document.getElementById('message').innerHTML += innerHTML + '<br/>';
+        scrollToEnd();//滚动到底部
+    }
+
+    //滚动到底部
+    function scrollToEnd(){
+        var h = $(document).height()-$(window).height();
+        $(document).scrollTop(h);
     }
 
 </script>

@@ -48,8 +48,17 @@ public class SocketServer {
      * @param message 客户端发送过来的消息*/
     @OnMessage
     public void onMessage(String message) {
-        System.out.println("当前发送人sessionid为：" + session.getId() + ", 发送内容为：" + message);
-    }
+        String sessionid = session.getId();
+        String userid = sessionIds.get(sessionid);
+        String newMessage = "发送人：" + userid  + ",\n sessionid：" + sessionid + ",\n 消息：" + message;
+            System.out.println(newMessage);
+            sendAll(newMessage);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
     /**
      *
@@ -102,4 +111,6 @@ public class SocketServer {
             sendMessage(msg,sessionIds.get(key));
         }
     }
+
+
 }
