@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.channels.NotYetConnectedException;
 
+import com.example.demo.protobuf.ProtoDemo;
 import org.java_websocket.WebSocket.READYSTATE;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
@@ -62,8 +63,27 @@ public class Client {
             Thread.sleep(100);
         }
         System.out.println("打开了");
-        send("hello world".getBytes("utf-8"));
-        client.send("hello world");
+//        send("hello world".getBytes("utf-8"));
+//        client.send("hello world String".getBytes("utf-8"));
+//        client.send("hello world");
+
+        ProtoDemo.Student.Builder builder = ProtoDemo.Student.newBuilder();
+        builder.setId(1);
+        builder.setName("caixiaoling");
+        builder.setEmail("caixiaoling@qq.com");
+        builder.setSex(ProtoDemo.Student.Sex.MAN);
+
+        ProtoDemo.Student.PhoneNumber.Builder phoneNumberBuilder =  ProtoDemo.Student.PhoneNumber.newBuilder();
+        phoneNumberBuilder.setNumber("15880000000");
+        phoneNumberBuilder.setType(ProtoDemo.Student.PhoneType.MOBILE);
+        ProtoDemo.Student.PhoneNumber phoneNumber = phoneNumberBuilder.build();
+        builder.setPhone(phoneNumber);
+
+        ProtoDemo.Student student = builder.build();
+        System.out.println("student:"+student);
+        System.out.println("studentStr:"+student.toString());
+        System.out.println("studentByte:"+student.toByteArray());
+        System.out.println("studentByteStr:"+student.toByteString());
     }
 
     public static void send(byte[] bytes){

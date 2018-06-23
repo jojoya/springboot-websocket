@@ -45,12 +45,12 @@ public class SocketServer {
     /**
      * 收到客户端消息后调用的方法
      *
-     * @param message 客户端发送过来的消息*/
+     * @param message 客户端发送过来的string、json消息*/
     @OnMessage
     public void onMessage(String message) {
         String sessionid = session.getId();
         String userid = sessionIds.get(sessionid);
-        String newMessage = "发送人：" + userid  + ",\n sessionid：" + sessionid + ",\n 消息：" + message;
+        String newMessage = "发送人：" + userid  + ",\n sessionid：" + sessionid + ",\n 消息：stringType：：" + message;
             System.out.println(newMessage);
             sendAll(newMessage);
             try {
@@ -59,6 +59,24 @@ public class SocketServer {
                 e.printStackTrace();
             }
         }
+
+    /**
+     * 收到客户端消息后调用的方法
+     *
+     * @param message 客户端发送过来的type消息*/
+    @OnMessage
+    public void onMessage(byte[] message) {
+        String sessionid = session.getId();
+        String userid = sessionIds.get(sessionid);
+        String newMessage = "发送人：" + userid  + ",\n sessionid：" + sessionid + ",\n 消息：byteType：：" + new String(message);
+        System.out.println(newMessage);
+        sendAll(newMessage);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      *
