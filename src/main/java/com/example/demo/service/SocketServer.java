@@ -1,5 +1,8 @@
 package com.example.demo.service;
 
+import com.example.demo.protobuf.ProtoDemo;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
@@ -65,10 +68,13 @@ public class SocketServer {
      *
      * @param message 客户端发送过来的type消息*/
     @OnMessage
-    public void onMessage(byte[] message) {
+    public void onMessage(byte[] message) throws InvalidProtocolBufferException{
         String sessionid = session.getId();
         String userid = sessionIds.get(sessionid);
-        String newMessage = "发送人：" + userid  + ",\n sessionid：" + sessionid + ",\n 消息：byteType：：" + new String(message);
+//        String newMessage = "发送人：" + userid  + ",\n sessionid：" + sessionid + ",\n 消息：byteType：：" + new String(message);
+        ProtoDemo.Student  student = ProtoDemo.Student.parseFrom(message);
+        String studentJson = JsonFormat.printer().print(student);
+        String newMessage = "发送人：" + userid  + ",\n sessionid：" + sessionid + ",\n 消息：byteType：：" + studentJson;
         System.out.println(newMessage);
         sendAll(newMessage);
         try {

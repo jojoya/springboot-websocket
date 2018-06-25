@@ -1,7 +1,6 @@
 package com.example.demo.client;
 
 import java.io.UnsupportedEncodingException;
-import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
@@ -66,7 +65,13 @@ public class Client {
 //        send("hello world".getBytes("utf-8"));
 //        client.send("hello world String".getBytes("utf-8"));
 //        client.send("hello world");
+        client.send(getStudent().toByteArray());
 
+
+
+    }
+
+    public static ProtoDemo.Student getStudent() {
         ProtoDemo.Student.Builder builder = ProtoDemo.Student.newBuilder();
         builder.setId(1);
         builder.setName("caixiaoling");
@@ -80,11 +85,17 @@ public class Client {
         builder.setPhone(phoneNumber);
 
         ProtoDemo.Student student = builder.build();
-        System.out.println("student:"+student);
-        System.out.println("studentStr:"+student.toString());
-        System.out.println("studentByte:"+student.toByteArray());
-        System.out.println("studentByteStr:"+student.toByteString());
+        /*System.out.println("===========student===========\n"+student);
+        System.out.println("===========studentStr===========\n"+student.toString());
+        System.out.println("===========studentByte===========\n"+student.toByteArray());
+        for(byte b:student.toByteArray()){
+            System.out.print(b);
+        }
+        System.out.println("\n===========studentByteStr===========\n"+student.toByteString());
+*/
+        return student;
     }
+
 
     public static void send(byte[] bytes){
         client.send(bytes);
