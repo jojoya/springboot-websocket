@@ -1,7 +1,7 @@
 package com.example;
 
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,4 +68,11 @@ public class test {
             System.out.println("group1:"+m.group(1)/*+", group2:"+m.group(2)+", group3:"+m.group(3)*/);        }
 
     }
+
+    @Test
+    public void test(){
+        System.out.println("Hello test.");
+    }
+
+
 }

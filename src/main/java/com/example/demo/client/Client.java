@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.NotYetConnectedException;
 
 import com.example.demo.protobuf.ProtoDemo;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.java_websocket.WebSocket.READYSTATE;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
@@ -28,8 +29,15 @@ public class Client {
             }
 
             @Override
-            public void onMessage(String arg0) {
-                System.out.println("client >>> 收到消息；"+arg0);
+            public void onMessage(String str) {
+                System.out.println("client >>> 收到消息(String)；"+str);
+
+                try {
+                    Class obj = Class.forName("com.example.demo.client.Client");//注意此字符串必须是真实路径，就是带包名的类路径，包名.类名
+//                    obj.getMethod()
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -45,6 +53,7 @@ public class Client {
 
             @Override
             public void onMessage(ByteBuffer bytes) {
+                System.out.println("client >>> 收到消息(ByteBuffer)；"+String.valueOf(bytes));
                 try {
                     System.out.println("client >>> " + new String(bytes.array(),"utf-8"));
                 } catch (UnsupportedEncodingException e) {
@@ -65,39 +74,73 @@ public class Client {
 //        send("hello world".getBytes("utf-8"));
 //        client.send("hello world String".getBytes("utf-8"));
 //        client.send("hello world");
-        client.send(getStudent().toByteArray());
 
+        ProtoDemo.Student student = getStudent();
+        byte[] student_byte = student.toByteArray();
+        client.send(student_byte);
 
+        ByteBuffer byteBuffer = ByteBuffer.wrap(student_byte);
+        client.send(byteBuffer);
 
     }
 
-    public static ProtoDemo.Student getStudent() {
-        ProtoDemo.Student.Builder builder = ProtoDemo.Student.newBuilder();
-        builder.setId(1);
-        builder.setName("caixiaoling");
-        builder.setEmail("caixiaoling@qq.com");
-        builder.setSex(ProtoDemo.Student.Sex.MAN);
-
+    public static ProtoDemo.Student getStudent(){
         ProtoDemo.Student.PhoneNumber.Builder phoneNumberBuilder =  ProtoDemo.Student.PhoneNumber.newBuilder();
         phoneNumberBuilder.setNumber("15880000000");
         phoneNumberBuilder.setType(ProtoDemo.Student.PhoneType.MOBILE);
         ProtoDemo.Student.PhoneNumber phoneNumber = phoneNumberBuilder.build();
+
+        ProtoDemo.Student.Builder builder = ProtoDemo.Student.newBuilder();
+        builder.setId(100000);
+        builder.setName("jmeter");
+        builder.setEmail("jmeter@qq.com");
+        builder.setSex(ProtoDemo.Student.Sex.MAN);
         builder.setPhone(phoneNumber);
 
         ProtoDemo.Student student = builder.build();
-        /*System.out.println("===========student===========\n"+student);
-        System.out.println("===========studentStr===========\n"+student.toString());
-        System.out.println("===========studentByte===========\n"+student.toByteArray());
+
+        System.out.println("===========student===========\n"+student);
+        byte[] byteStudent = student.toByteArray();
+        System.out.println("===========studentByte===========\n"+byteStudent);
+        StringBuffer sb = new StringBuffer();
         for(byte b:student.toByteArray()){
+            sb.append(b);
             System.out.print(b);
         }
-        System.out.println("\n===========studentByteStr===========\n"+student.toByteString());
-*/
+//        System.out.println("\n===========studentByteStr===========\n"+student.toByteString());
+
+        System.out.println("\n16:::"+bytesToHex(byteStudent));
+
+        ProtoDemo.Student  studentBack = null;
+        try {
+            studentBack = ProtoDemo.Student.parseFrom(byteStudent);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        System.out.println("studentBack:\n"+studentBack);
+
         return student;
     }
 
 
     public static void send(byte[] bytes){
         client.send(bytes);
+    }
+
+    /**
+     * 字节数组转16进制
+     * @param bytes 需要转换的byte数组
+     * @return  转换后的Hex字符串
+     */
+    public static String bytesToHex(byte[] bytes) {
+        StringBuffer sb = new StringBuffer();
+        for(int i = 0; i < bytes.length; i++) {
+            String hex = Integer.toHexString(bytes[i] & 0xFF);
+            if(hex.length() < 2){
+                sb.append(0);
+            }
+            sb.append(hex);
+        }
+        return sb.toString();
     }
 }
